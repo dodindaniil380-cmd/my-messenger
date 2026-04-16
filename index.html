@@ -2,15 +2,16 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Messenger PRO</title>
+    <title>Messenger PRO FINAL</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="icon" href="data:,">
 
     <style>
         body { margin:0; font-family:Arial; background:#0f172a; color:white; }
         .container { display:flex; height:100vh; }
 
-        /* SIDEBAR */
         .sidebar { width:320px; background:#1e293b; display:flex; flex-direction:column; }
         .top { padding:10px; }
 
@@ -21,55 +22,25 @@
         }
         .chat-item:hover { background:#334155; }
 
-        .last-msg {
-          font-size:12px;
-          color:#94a3b8;
-        }
+        .last-msg { font-size:12px; color:#94a3b8; }
 
-        /* CHAT */
         .chat { flex:1; display:flex; flex-direction:column; }
         .chat-header { padding:15px; background:#1e293b; font-weight:bold; }
 
-        #messages {
-          flex:1;
-          overflow-y:auto;
-          padding:10px;
-        }
+        #messages { flex:1; overflow-y:auto; padding:10px; }
 
-        .msg {
-          display:flex;
-          flex-direction:column;
-          margin-top:8px;
-          max-width:70%;
-        }
-
+        .msg { display:flex; flex-direction:column; margin-top:8px; max-width:70%; }
         .me { margin-left:auto; }
 
-        .msg-bubble {
-          padding:10px;
-          border-radius:12px;
-        }
-
+        .msg-bubble { padding:10px; border-radius:12px; }
         .me .msg-bubble { background:#2563eb; }
         .other .msg-bubble { background:#334155; }
 
-        .msg img {
-          max-width:220px;
-          border-radius:12px;
-        }
+        .msg img { max-width:220px; border-radius:12px; }
 
-        /* INPUT */
-        .chat-input {
-          display:none;
-          padding:10px;
-          background:#1e293b;
-        }
+        .chat-input { display:none; padding:10px; background:#1e293b; }
 
-        .preview {
-          max-width:120px;
-          border-radius:10px;
-          margin-top:5px;
-        }
+        .preview { max-width:120px; border-radius:10px; margin-top:5px; }
 
         input {
           padding:10px;
@@ -86,9 +57,10 @@
           background:#3b82f6;
           color:white;
           margin-top:5px;
+          cursor:pointer;
+          touch-action: manipulation;
         }
 
-        /* MOBILE */
         @media (max-width:768px){
           body { position:fixed; }
           .sidebar { width:100%; }
@@ -108,7 +80,8 @@
 
 <div id="authScreen">
     <input id="loginEmail" placeholder="Email">
-    <input id="loginPass" type="password">
+    <input id="loginPass" type="password" placeholder="Password"
+           onkeypress="if(event.key==='Enter') login()">
     <button onclick="login()">Войти</button>
     <button onclick="register()">Регистрация</button>
 </div>
@@ -131,7 +104,8 @@
         <div id="messages"></div>
 
         <div id="chatInput" class="chat-input">
-            <input id="messageInput" placeholder="Сообщение" onkeypress="if(event.key==='Enter') sendMessage()">
+            <input id="messageInput" placeholder="Сообщение"
+                   onkeypress="if(event.key==='Enter') sendMessage()">
 
             <input type="file" id="fileInput" onchange="previewImage()">
             <img id="preview" class="preview" style="display:none">
@@ -152,11 +126,12 @@
 
     /* CONFIG */
     const app = initializeApp({
-  apiKey: "AIzaSyXXXXXX",
-  authDomain: "my-messenger-53823.firebaseapp.com",
-  projectId: "my-messenger-53823",
-  appId: "1:953050870993:web:XXXXXXXX"
-});
+      apiKey: "AIzaSyBLBAeIPj7DTcoV0Ns3OGjHl2XHoid-0UA",
+      authDomain: "my-messenger-53823.firebaseapp.com",
+      projectId: "my-messenger-53823",
+      messagingSenderId: "953050870993",
+      appId: "1:953050870993:web:98b6a4080f5a6a142f41f0"
+    });
 
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -165,43 +140,54 @@
     let currentChatId;
 
     /* AUTH */
-    window.login = () => signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
+    window.login = async () => {
+      try {
+        await signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
+      } catch (e) {
+        alert(e.message);
+      }
+    };
 
     window.register = async () => {
-      const user = await createUserWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
+      try {
+        const user = await createUserWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
 
-      await setDoc(doc(db, "users", user.user.uid), {
-        username: loginEmail.value.split("@")[0],
-        online: true
-      });
+        await setDoc(doc(db, "users", user.user.uid), {
+          username: loginEmail.value.split("@")[0],
+          online: true
+        });
+
+      } catch (e) {
+        alert(e.message);
+      }
     };
 
     window.logout = () => signOut(auth);
 
     onAuthStateChanged(auth, async user => {
-  if (user) {
-    currentUser = user;
-    authScreen.style.display="none";
-    appScreen.style.display="flex";
+      if (user) {
+        currentUser = user;
+        authScreen.style.display="none";
+        appScreen.style.display="flex";
 
-    const refUser = doc(db,"users",user.uid);
-    const snap = await getDoc(refUser);
+        const ref = doc(db,"users",user.uid);
+        const snap = await getDoc(ref);
 
-    if(snap.exists()){
-      await updateDoc(refUser,{online:true});
-    } else {
-      await setDoc(refUser,{
-        username: user.email.split("@")[0],
-        online: true
-      });
-    }
+        if(snap.exists()){
+          await updateDoc(ref,{online:true});
+        } else {
+          await setDoc(ref,{
+            username: user.email.split("@")[0],
+            online:true
+          });
+        }
 
-    listenChats();
-  } else {
-    authScreen.style.display="block";
-    appScreen.style.display="none";
-  }
-});
+        listenChats();
+      } else {
+        authScreen.style.display="block";
+        appScreen.style.display="none";
+      }
+    });
 
     /* PREVIEW */
     window.previewImage = () => {
@@ -257,9 +243,9 @@
             orderBy("time","desc")
           ));
 
-          let last = "";
+          let last="";
           if(!lastMsgSnap.empty){
-            const m = lastMsgSnap.docs[0].data();
+            const m=lastMsgSnap.docs[0].data();
             last = m.text || "📸 Фото";
           }
 
@@ -295,11 +281,7 @@
           const div=document.createElement("div");
           div.className="msg";
 
-          if(msg.uid===currentUser.uid){
-            div.classList.add("me");
-          } else {
-            div.classList.add("other");
-          }
+          div.classList.add(msg.uid===currentUser.uid?"me":"other");
 
           if(msg.img){
             div.innerHTML=`<img src="${msg.img}">`;
@@ -314,8 +296,8 @@
       });
     }
 
-    /* СЖАТИЕ */
-    function compressImage(base64, quality=0.7){
+    /* COMPRESS */
+    function compressImage(base64, quality=0.6){
       return new Promise(resolve=>{
         const img=new Image();
         img.src=base64;
@@ -342,8 +324,7 @@
 
         reader.onload=async e=>{
           let base64=e.target.result;
-
-          base64 = await compressImage(base64,0.6);
+          base64 = await compressImage(base64);
 
           await addDoc(collection(db,"chats",currentChatId,"messages"),{
             img: base64,
@@ -353,7 +334,6 @@
         };
 
         reader.readAsDataURL(fileInput.files[0]);
-
         preview.style.display="none";
         fileInput.value="";
         return;
