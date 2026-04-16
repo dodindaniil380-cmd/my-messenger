@@ -2,68 +2,130 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Messenger PRO FINAL</title>
+    <title>Messenger PRO MOBILE FIX</title>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <link rel="icon" href="data:,">
 
     <style>
-        body { margin:0; font-family:Arial; background:#0f172a; color:white; }
-        .container { display:flex; height:100vh; }
+        html, body {
+          height: 100%;
+          margin: 0;
+          font-family: Arial;
+          background: #0f172a;
+          color: white;
+          overflow: hidden;
+        }
 
-        .sidebar { width:320px; background:#1e293b; display:flex; flex-direction:column; }
-        .top { padding:10px; }
+        .container {
+          display: flex;
+          height: 100dvh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+          width: 320px;
+          background: #1e293b;
+          display: flex;
+          flex-direction: column;
+        }
+
+        .top { padding: 10px; }
 
         .chat-item {
-          padding:12px;
-          border-bottom:1px solid #334155;
-          cursor:pointer;
+          padding: 12px;
+          border-bottom: 1px solid #334155;
+          cursor: pointer;
         }
-        .chat-item:hover { background:#334155; }
+        .chat-item:hover { background: #334155; }
 
-        .last-msg { font-size:12px; color:#94a3b8; }
+        .last-msg {
+          font-size: 12px;
+          color: #94a3b8;
+        }
 
-        .chat { flex:1; display:flex; flex-direction:column; }
-        .chat-header { padding:15px; background:#1e293b; font-weight:bold; }
+        /* CHAT */
+        .chat {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+        }
 
-        #messages { flex:1; overflow-y:auto; padding:10px; }
+        .chat-header {
+          padding: 15px;
+          background: #1e293b;
+          font-weight: bold;
+        }
 
-        .msg { display:flex; flex-direction:column; margin-top:8px; max-width:70%; }
-        .me { margin-left:auto; }
+        #messages {
+          flex: 1;
+          overflow-y: auto;
+          padding: 10px;
+          -webkit-overflow-scrolling: touch;
+        }
 
-        .msg-bubble { padding:10px; border-radius:12px; }
-        .me .msg-bubble { background:#2563eb; }
-        .other .msg-bubble { background:#334155; }
+        .msg {
+          display: flex;
+          flex-direction: column;
+          margin-top: 8px;
+          max-width: 70%;
+        }
 
-        .msg img { max-width:220px; border-radius:12px; }
+        .me { margin-left: auto; }
 
-        .chat-input { display:none; padding:10px; background:#1e293b; }
+        .msg-bubble {
+          padding: 10px;
+          border-radius: 12px;
+        }
 
-        .preview { max-width:120px; border-radius:10px; margin-top:5px; }
+        .me .msg-bubble { background: #2563eb; }
+        .other .msg-bubble { background: #334155; }
+
+        .msg img {
+          max-width: 220px;
+          border-radius: 12px;
+        }
+
+        /* INPUT */
+        .chat-input {
+          display: none;
+          padding: 10px;
+          background: #1e293b;
+          position: sticky;
+          bottom: 0;
+        }
+
+        .preview {
+          max-width: 120px;
+          border-radius: 10px;
+          margin-top: 5px;
+        }
 
         input {
-          padding:10px;
-          border-radius:10px;
-          border:none;
-          width:100%;
-          margin-top:5px;
+          padding: 10px;
+          border-radius: 10px;
+          border: none;
+          width: 100%;
+          margin-top: 5px;
+          font-size: 16px; /* фикс зума */
         }
 
         button {
-          padding:10px;
-          border:none;
-          border-radius:10px;
-          background:#3b82f6;
-          color:white;
-          margin-top:5px;
-          cursor:pointer;
+          padding: 10px;
+          border: none;
+          border-radius: 10px;
+          background: #3b82f6;
+          color: white;
+          margin-top: 5px;
+          cursor: pointer;
           touch-action: manipulation;
         }
 
+        /* MOBILE */
         @media (max-width:768px){
-          body { position:fixed; }
           .sidebar { width:100%; }
+
           .chat {
             position:absolute;
             width:100%;
@@ -71,6 +133,7 @@
             left:100%;
             transition:.3s;
           }
+
           .chat.active { left:0; }
         }
     </style>
@@ -126,12 +189,12 @@
 
     /* CONFIG */
     const app = initializeApp({
-  apiKey: "AIzaSyBLBAeIPj7DTcoV0Ns3OGjHl2XHoid-0UA",
-  authDomain: "my-messenger-53823.firebaseapp.com",
-  projectId: "my-messenger-53823",
-  messagingSenderId: "953050870993",
-  appId: "1:953050870993:web:98b6a4080f5a6a142f41f0"
-});
+      apiKey: "AIzaSyBLBAeIPj7DTcoV0Ns3OGjHl2XHoid-0UA",
+      authDomain: "my-messenger-53823.firebaseapp.com",
+      projectId: "my-messenger-53823",
+      messagingSenderId: "953050870993",
+      appId: "1:953050870993:web:98b6a4080f5a6a142f41f0"
+    });
 
     const auth = getAuth(app);
     const db = getFirestore(app);
@@ -280,7 +343,6 @@
 
           const div=document.createElement("div");
           div.className="msg";
-
           div.classList.add(msg.uid===currentUser.uid?"me":"other");
 
           if(msg.img){
