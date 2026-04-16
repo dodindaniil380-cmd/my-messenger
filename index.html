@@ -2,68 +2,64 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Messenger ULTRA FINAL</title>
+    <title>Messenger FINAL FIX</title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
     <style>
         body { margin:0; font-family:Arial; background:#0f172a; color:white; }
         .container { display:flex; height:100vh; }
-
-        /* SIDEBAR */
+        
         .sidebar { width:320px; background:#1e293b; display:flex; flex-direction:column; }
         .top { padding:10px; }
-
+        
         .chat-item {
           padding:12px;
           border-bottom:1px solid #334155;
           cursor:pointer;
         }
         .chat-item:hover { background:#334155; }
-
+        
         .online { font-size:12px; color:lime; }
-        .last-msg { font-size:12px; color:#94a3b8; }
-
-        /* CHAT */
+        
         .chat { flex:1; display:flex; flex-direction:column; }
         .chat-header { padding:15px; background:#1e293b; }
-
+        
         #messages {
           flex:1;
           overflow-y:auto;
           padding:10px;
         }
-
+        
         .msg {
           display:flex;
           flex-direction:column;
           margin-top:8px;
           max-width:70%;
         }
-
+        
         .me { margin-left:auto; }
-
+        
         .msg-bubble {
           padding:10px;
           border-radius:12px;
         }
-
+        
         .me .msg-bubble { background:#2563eb; }
         .other .msg-bubble { background:#334155; }
-
+        
         .msg img {
           max-width:220px;
           border-radius:12px;
           margin-top:5px;
-          box-shadow:0 4px 10px rgba(0,0,0,0.4);
         }
-
+        
         .chat-input {
           display:none;
           padding:10px;
           background:#1e293b;
         }
-
+        
         input {
           padding:10px;
           border-radius:10px;
@@ -71,7 +67,7 @@
           width:100%;
           margin-top:5px;
         }
-
+        
         button {
           padding:10px;
           border:none;
@@ -80,8 +76,7 @@
           color:white;
           margin-top:5px;
         }
-
-        /* MOBILE */
+        
         @media (max-width:768px){
           body { position:fixed; }
           .sidebar { width:100%; }
@@ -136,50 +131,49 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut }
     from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-
+    
     import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, onSnapshot, query, orderBy, updateDoc }
     from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
-
+    
     import { getStorage, ref, uploadBytes, getDownloadURL }
     from "https://www.gstatic.com/firebasejs/12.12.0/firebase-storage.js";
-
-    /* ТВОЙ РЕАЛЬНЫЙ CONFIG */
+    
+    /* ✅ ИСПРАВЛЕННЫЙ CONFIG */
     const app = initializeApp({
       apiKey: "AIzaSyBLBAeIPj7DTcoV0Ns3OGjHl2XHoid-0UA",
       authDomain: "my-messenger-53823.firebaseapp.com",
       projectId: "my-messenger-53823",
-      storageBucket: "my-messenger-53823.firebasestorage.app",
+      storageBucket: "my-messenger-53823.appspot.com",
       messagingSenderId: "953050870993",
       appId: "1:953050870993:web:98b6a4080f5a6a142f41f0"
     });
-
+    
     const auth = getAuth(app);
     const db = getFirestore(app);
     const storage = getStorage(app);
-
+    
     let currentUser;
     let currentChatId;
-
-    /* AUTH */
+    
     window.login = () => signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
-
+    
     window.register = async () => {
       const user = await createUserWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
-
+    
       await setDoc(doc(db, "users", user.user.uid), {
         username: loginEmail.value.split("@")[0],
         online: true
       });
     };
-
+    
     window.logout = () => signOut(auth);
-
+    
     onAuthStateChanged(auth, async user => {
       if (user) {
         currentUser = user;
         authScreen.style.display="none";
         appScreen.style.display="flex";
-
+    
         await updateDoc(doc(db,"users",user.uid),{online:true});
         listenChats();
       } else {
@@ -187,12 +181,11 @@
         appScreen.style.display="none";
       }
     });
-
-    /* SEARCH */
+    
     window.searchUsers = async () => {
       const snap = await getDocs(collection(db,"users"));
       users.innerHTML="";
-
+    
       snap.forEach(d=>{
         const u=d.data();
         if(u.username.includes(search.value)){
@@ -204,115 +197,104 @@
         }
       });
     };
-
-    /* CREATE CHAT */
+    
     async function createChat(user,id){
       const chatId=[currentUser.uid,id].sort().join("_");
       await setDoc(doc(db,"chats",chatId),{users:[currentUser.uid,id]});
       openChat(chatId,user.username);
     }
-
-    /* CHAT LIST */
+    
     function listenChats(){
       onSnapshot(collection(db,"chats"), async snap=>{
         chats.innerHTML="";
-
+    
         for(const d of snap.docs){
           const data=d.data();
           if(!data.users.includes(currentUser.uid)) continue;
-
+    
           const other=data.users.find(u=>u!==currentUser.uid);
           const userDoc=await getDoc(doc(db,"users",other));
-
+    
           const div=document.createElement("div");
           div.className="chat-item";
-
+    
           div.innerHTML=`
             <b>${userDoc.data().username}</b>
             <div class="online">${userDoc.data().online?"🟢 online":"⚫ offline"}</div>
           `;
-
+    
           div.onclick=()=>openChat(d.id,userDoc.data().username);
           chats.appendChild(div);
         }
       });
     }
-
-    /* OPEN CHAT */
+    
     function openChat(id,name){
       currentChatId=id;
       chatHeader.innerText=name;
       chatInput.style.display="block";
       chatScreen.classList.add("active");
-
+    
       const q=query(collection(db,"chats",id,"messages"),orderBy("time"));
-
+    
       onSnapshot(q,snap=>{
         messages.innerHTML="";
-
+    
         snap.forEach(d=>{
           const msg=d.data();
-
+    
           const div=document.createElement("div");
           div.className="msg";
-
+    
           if(msg.uid===currentUser.uid){
             div.classList.add("me");
           } else {
             div.classList.add("other");
           }
-
+    
           if(msg.img){
             div.innerHTML=`<img src="${msg.img}">`;
           } else {
             div.innerHTML=`<div class="msg-bubble">${msg.text}</div>`;
           }
-
+    
           messages.appendChild(div);
         });
-
+    
         messages.scrollTop=messages.scrollHeight;
-
-        if(document.hidden){
-          new Notification("Новое сообщение");
-        }
       });
     }
-
-    /* SEND */
+    
     window.sendMessage = async ()=>{
       if(!currentChatId) return;
-
+    
       if(fileInput.files[0]){
         const file=fileInput.files[0];
         const storageRef=ref(storage,"images/"+Date.now());
-
+    
         await uploadBytes(storageRef,file);
         const url=await getDownloadURL(storageRef);
-
+    
         await addDoc(collection(db,"chats",currentChatId,"messages"),{
           img:url,
           uid:currentUser.uid,
           time:Date.now()
         });
-
+    
         fileInput.value="";
         return;
       }
-
+    
       if(!messageInput.value) return;
-
+    
       await addDoc(collection(db,"chats",currentChatId,"messages"),{
         text:messageInput.value,
         uid:currentUser.uid,
         time:Date.now()
       });
-
+    
       messageInput.value="";
     };
-
-    /* NOTIFICATIONS */
-    Notification.requestPermission();
 </script>
 
 </body>
