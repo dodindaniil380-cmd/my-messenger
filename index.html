@@ -1,390 +1,319 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Messenger Pro</title>
+    <meta charset="UTF-8">
+    <title>Messenger ULTRA FINAL</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<style>
-body {
-  margin: 0;
-  font-family: Arial;
-  background: #0f172a;
-  color: white;
-}
+    <style>
+        body { margin:0; font-family:Arial; background:#0f172a; color:white; }
+        .container { display:flex; height:100vh; }
 
-/* FIX MOBILE */
-html, body {
-  height: 100%;
-  overflow: hidden;
-}
+        /* SIDEBAR */
+        .sidebar { width:320px; background:#1e293b; display:flex; flex-direction:column; }
+        .top { padding:10px; }
 
-input, textarea {
-  font-size: 16px;
-}
+        .chat-item {
+          padding:12px;
+          border-bottom:1px solid #334155;
+          cursor:pointer;
+        }
+        .chat-item:hover { background:#334155; }
 
-* {
-  -webkit-tap-highlight-color: transparent;
-}
+        .online { font-size:12px; color:lime; }
+        .last-msg { font-size:12px; color:#94a3b8; }
 
-/* LAYOUT */
-.container {
-  display: flex;
-  height: 100vh;
-}
+        /* CHAT */
+        .chat { flex:1; display:flex; flex-direction:column; }
+        .chat-header { padding:15px; background:#1e293b; }
 
-/* SIDEBAR */
-.sidebar {
-  width: 320px;
-  background: #1e293b;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
+        #messages {
+          flex:1;
+          overflow-y:auto;
+          padding:10px;
+        }
 
-.chat-item {
-  padding: 12px;
-  background: #334155;
-  margin-top: 5px;
-  border-radius: 10px;
-  cursor: pointer;
-}
+        .msg {
+          display:flex;
+          flex-direction:column;
+          margin-top:8px;
+          max-width:70%;
+        }
 
-/* CHAT */
-.chat {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
+        .me { margin-left:auto; }
 
-.chat-header {
-  padding: 15px;
-  background: #1e293b;
-  font-weight: bold;
-  display: flex;
-}
+        .msg-bubble {
+          padding:10px;
+          border-radius:12px;
+        }
 
-.back-btn {
-  display: none;
-  margin-right: 10px;
-  cursor: pointer;
-}
+        .me .msg-bubble { background:#2563eb; }
+        .other .msg-bubble { background:#334155; }
 
-#messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-}
+        .msg img {
+          max-width:220px;
+          border-radius:12px;
+          margin-top:5px;
+          box-shadow:0 4px 10px rgba(0,0,0,0.4);
+        }
 
-.msg {
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 12px;
-  background: #334155;
-  max-width: 70%;
-}
+        .chat-input {
+          display:none;
+          padding:10px;
+          background:#1e293b;
+        }
 
-.me {
-  background: #2563eb;
-  margin-left: auto;
-}
+        input {
+          padding:10px;
+          border-radius:10px;
+          border:none;
+          width:100%;
+          margin-top:5px;
+        }
 
-.chat-input {
-  display: none;
-  padding: 10px;
-  background: #1e293b;
-  width: 100%;
-}
+        button {
+          padding:10px;
+          border:none;
+          border-radius:10px;
+          background:#3b82f6;
+          color:white;
+          margin-top:5px;
+        }
 
-button {
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  background: #3b82f6;
-  color: white;
-}
-
-input {
-  padding: 10px;
-  border-radius: 10px;
-  border: none;
-  width: 100%;
-  margin-top: 5px;
-}
-
-/* AUTH */
-#authScreen {
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
-}
-
-.card {
-  background: #1e293b;
-  padding: 20px;
-  border-radius: 12px;
-  width: 300px;
-}
-
-/* MODAL */
-.modal {
-  position: fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background: rgba(0,0,0,0.7);
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-
-.modal-content {
-  background:#1e293b;
-  padding:20px;
-  border-radius:12px;
-  width:300px;
-}
-
-/* MOBILE */
-@media (max-width: 768px) {
-
-  body {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-  }
-
-  .sidebar {
-    width: 100%;
-  }
-
-  .chat {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    left: 100%;
-    background: #0f172a;
-    transition: 0.3s;
-  }
-
-  .chat.active {
-    left: 0;
-  }
-
-  .back-btn {
-    display: block;
-  }
-
-  #messages {
-    padding-bottom: 80px;
-  }
-
-  .chat-input {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-  }
-}
-</style>
+        /* MOBILE */
+        @media (max-width:768px){
+          body { position:fixed; }
+          .sidebar { width:100%; }
+          .chat {
+            position:absolute;
+            width:100%;
+            height:100%;
+            left:100%;
+            transition:.3s;
+          }
+          .chat.active { left:0; }
+        }
+    </style>
 </head>
 
 <body>
 
 <div id="authScreen">
-  <div class="card">
-    <h2>Вход</h2>
     <input id="loginEmail" placeholder="Email">
     <input id="loginPass" type="password">
     <button onclick="login()">Войти</button>
-    <button onclick="openRegister()">Регистрация</button>
-  </div>
-</div>
-
-<div id="registerModal" class="modal">
-  <div class="modal-content">
-    <input id="regUsername" placeholder="username">
-    <input id="regEmail" placeholder="Email">
-    <input id="regPass" type="password">
-    <input id="regPass2" type="password">
-    <button onclick="register()">Создать</button>
-  </div>
+    <button onclick="register()">Регистрация</button>
 </div>
 
 <div id="appScreen" class="container" style="display:none">
 
-  <div class="sidebar">
-    <button onclick="logout()">Выйти</button>
-    <input id="search" placeholder="@username" oninput="searchUsers()">
-    <div id="users"></div>
-    <h4>Чаты</h4>
-    <div id="chats"></div>
-  </div>
+    <div class="sidebar">
+        <div class="top">
+            <button onclick="logout()">Выйти</button>
+            <input id="search" placeholder="Поиск" oninput="searchUsers()">
+        </div>
 
-  <div id="chatScreen" class="chat">
-    <div class="chat-header">
-      <span class="back-btn" onclick="closeChat()">⬅</span>
-      <span id="chatHeader">Выберите чат</span>
+        <div id="users"></div>
+        <div id="chats"></div>
     </div>
 
-    <div id="messages"></div>
+    <div id="chatScreen" class="chat">
+        <div class="chat-header" id="chatHeader">Чат</div>
 
-    <div id="chatInput" class="chat-input">
-      <input id="messageInput" placeholder="Сообщение">
-      <button onclick="sendMessage()">Отправить</button>
+        <div id="messages"></div>
+
+        <div id="chatInput" class="chat-input">
+            <input id="messageInput" placeholder="Сообщение" onkeypress="if(event.key==='Enter') sendMessage()">
+            <input type="file" id="fileInput">
+            <button onclick="sendMessage()">Отправить</button>
+        </div>
     </div>
-  </div>
 
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut }
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, onSnapshot, query, orderBy }
-from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+    from "https://www.gstatic.com/firebasejs/12.12.0/firebase-auth.js";
 
-const app = initializeApp({
-  apiKey: "AIzaSyBLBAeIPj7DTcoV0Ns3OGjHl2XHoid-0UA",
-  authDomain: "my-messenger-53823.firebaseapp.com",
-  projectId: "my-messenger-53823"
-});
+    import { getFirestore, collection, addDoc, getDocs, doc, setDoc, getDoc, onSnapshot, query, orderBy, updateDoc }
+    from "https://www.gstatic.com/firebasejs/12.12.0/firebase-firestore.js";
 
-const auth = getAuth(app);
-const db = getFirestore(app);
+    import { getStorage, ref, uploadBytes, getDownloadURL }
+    from "https://www.gstatic.com/firebasejs/12.12.0/firebase-storage.js";
 
-let currentUser = null;
-let currentChatId = null;
-
-const authScreen = document.getElementById("authScreen");
-const appScreen = document.getElementById("appScreen");
-const chatInput = document.getElementById("chatInput");
-const chatHeader = document.getElementById("chatHeader");
-const chatScreen = document.getElementById("chatScreen");
-
-window.login = () => signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
-window.logout = () => signOut(auth);
-
-window.openRegister = () => registerModal.style.display = "flex";
-
-window.register = async () => {
-  if (regPass.value !== regPass2.value) return alert("Пароли не совпадают");
-
-  const user = await createUserWithEmailAndPassword(auth, regEmail.value, regPass.value);
-
-  await setDoc(doc(db, "users", user.user.uid), {
-    username: regUsername.value.toLowerCase(),
-    uid: user.user.uid
-  });
-
-  registerModal.style.display = "none";
-};
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    currentUser = user;
-    authScreen.style.display = "none";
-    appScreen.style.display = "flex";
-    listenChats();
-  } else {
-    authScreen.style.display = "flex";
-    appScreen.style.display = "none";
-  }
-});
-
-window.searchUsers = async () => {
-  const snap = await getDocs(collection(db, "users"));
-  users.innerHTML = "";
-
-  snap.forEach(docSnap => {
-    const u = docSnap.data();
-    if (u.uid === currentUser.uid) return;
-    if (!u.username.includes(search.value.toLowerCase())) return;
-
-    const div = document.createElement("div");
-    div.className = "chat-item";
-    div.innerText = "@" + u.username;
-
-    div.onclick = () => createChat(u);
-    users.appendChild(div);
-  });
-};
-
-async function createChat(user) {
-  const chatId = [currentUser.uid, user.uid].sort().join("_");
-
-  await setDoc(doc(db, "chats", chatId), {
-    users: [currentUser.uid, user.uid]
-  });
-
-  openChat(chatId);
-}
-
-function listenChats() {
-  onSnapshot(collection(db, "chats"), async snap => {
-    chats.innerHTML = "";
-
-    for (const docSnap of snap.docs) {
-      const data = docSnap.data();
-      if (!data.users.includes(currentUser.uid)) continue;
-
-      const otherId = data.users.find(u => u !== currentUser.uid);
-      const userDoc = await getDoc(doc(db, "users", otherId));
-      const username = userDoc.data()?.username || "user";
-
-      const div = document.createElement("div");
-      div.className = "chat-item";
-      div.innerText = "@" + username;
-
-      div.onclick = () => openChat(docSnap.id, username);
-      chats.appendChild(div);
-    }
-  });
-}
-
-function openChat(chatId, name="Чат") {
-  currentChatId = chatId;
-  chatHeader.innerText = name;
-  chatInput.style.display = "block";
-  chatScreen.classList.add("active");
-
-  const q = query(collection(db, "chats", chatId, "messages"), orderBy("time"));
-
-  onSnapshot(q, snap => {
-    messages.innerHTML = "";
-
-    snap.forEach(doc => {
-      const msg = doc.data();
-      const div = document.createElement("div");
-
-      div.className = "msg";
-      if (msg.uid === currentUser.uid) div.classList.add("me");
-
-      div.innerText = msg.text;
-      messages.appendChild(div);
+    /* ТВОЙ РЕАЛЬНЫЙ CONFIG */
+    const app = initializeApp({
+      apiKey: "AIzaSyBLBAeIPj7DTcoV0Ns3OGjHl2XHoid-0UA",
+      authDomain: "my-messenger-53823.firebaseapp.com",
+      projectId: "my-messenger-53823",
+      storageBucket: "my-messenger-53823.firebasestorage.app",
+      messagingSenderId: "953050870993",
+      appId: "1:953050870993:web:98b6a4080f5a6a142f41f0"
     });
-  });
-}
 
-window.closeChat = () => {
-  chatScreen.classList.remove("active");
-  currentChatId = null;
-  chatInput.style.display = "none";
-};
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
-window.sendMessage = async () => {
-  if (!currentChatId) return;
+    let currentUser;
+    let currentChatId;
 
-  await addDoc(collection(db, "chats", currentChatId, "messages"), {
-    text: messageInput.value,
-    uid: currentUser.uid,
-    time: Date.now()
-  });
+    /* AUTH */
+    window.login = () => signInWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
 
-  messageInput.value = "";
-};
+    window.register = async () => {
+      const user = await createUserWithEmailAndPassword(auth, loginEmail.value, loginPass.value);
+
+      await setDoc(doc(db, "users", user.user.uid), {
+        username: loginEmail.value.split("@")[0],
+        online: true
+      });
+    };
+
+    window.logout = () => signOut(auth);
+
+    onAuthStateChanged(auth, async user => {
+      if (user) {
+        currentUser = user;
+        authScreen.style.display="none";
+        appScreen.style.display="flex";
+
+        await updateDoc(doc(db,"users",user.uid),{online:true});
+        listenChats();
+      } else {
+        authScreen.style.display="block";
+        appScreen.style.display="none";
+      }
+    });
+
+    /* SEARCH */
+    window.searchUsers = async () => {
+      const snap = await getDocs(collection(db,"users"));
+      users.innerHTML="";
+
+      snap.forEach(d=>{
+        const u=d.data();
+        if(u.username.includes(search.value)){
+          const div=document.createElement("div");
+          div.className="chat-item";
+          div.innerText=u.username;
+          div.onclick=()=>createChat(u,d.id);
+          users.appendChild(div);
+        }
+      });
+    };
+
+    /* CREATE CHAT */
+    async function createChat(user,id){
+      const chatId=[currentUser.uid,id].sort().join("_");
+      await setDoc(doc(db,"chats",chatId),{users:[currentUser.uid,id]});
+      openChat(chatId,user.username);
+    }
+
+    /* CHAT LIST */
+    function listenChats(){
+      onSnapshot(collection(db,"chats"), async snap=>{
+        chats.innerHTML="";
+
+        for(const d of snap.docs){
+          const data=d.data();
+          if(!data.users.includes(currentUser.uid)) continue;
+
+          const other=data.users.find(u=>u!==currentUser.uid);
+          const userDoc=await getDoc(doc(db,"users",other));
+
+          const div=document.createElement("div");
+          div.className="chat-item";
+
+          div.innerHTML=`
+            <b>${userDoc.data().username}</b>
+            <div class="online">${userDoc.data().online?"🟢 online":"⚫ offline"}</div>
+          `;
+
+          div.onclick=()=>openChat(d.id,userDoc.data().username);
+          chats.appendChild(div);
+        }
+      });
+    }
+
+    /* OPEN CHAT */
+    function openChat(id,name){
+      currentChatId=id;
+      chatHeader.innerText=name;
+      chatInput.style.display="block";
+      chatScreen.classList.add("active");
+
+      const q=query(collection(db,"chats",id,"messages"),orderBy("time"));
+
+      onSnapshot(q,snap=>{
+        messages.innerHTML="";
+
+        snap.forEach(d=>{
+          const msg=d.data();
+
+          const div=document.createElement("div");
+          div.className="msg";
+
+          if(msg.uid===currentUser.uid){
+            div.classList.add("me");
+          } else {
+            div.classList.add("other");
+          }
+
+          if(msg.img){
+            div.innerHTML=`<img src="${msg.img}">`;
+          } else {
+            div.innerHTML=`<div class="msg-bubble">${msg.text}</div>`;
+          }
+
+          messages.appendChild(div);
+        });
+
+        messages.scrollTop=messages.scrollHeight;
+
+        if(document.hidden){
+          new Notification("Новое сообщение");
+        }
+      });
+    }
+
+    /* SEND */
+    window.sendMessage = async ()=>{
+      if(!currentChatId) return;
+
+      if(fileInput.files[0]){
+        const file=fileInput.files[0];
+        const storageRef=ref(storage,"images/"+Date.now());
+
+        await uploadBytes(storageRef,file);
+        const url=await getDownloadURL(storageRef);
+
+        await addDoc(collection(db,"chats",currentChatId,"messages"),{
+          img:url,
+          uid:currentUser.uid,
+          time:Date.now()
+        });
+
+        fileInput.value="";
+        return;
+      }
+
+      if(!messageInput.value) return;
+
+      await addDoc(collection(db,"chats",currentChatId,"messages"),{
+        text:messageInput.value,
+        uid:currentUser.uid,
+        time:Date.now()
+      });
+
+      messageInput.value="";
+    };
+
+    /* NOTIFICATIONS */
+    Notification.requestPermission();
 </script>
 
 </body>
-</html>ы
+</html>
